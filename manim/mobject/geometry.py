@@ -267,9 +267,6 @@ class Arc(TipableVMobject):
         arc_center=ORIGIN,
         **kwargs
     ):
-        if radius is None:  # apparently None is passed by ArcBetweenPoints
-            radius = 1.0
-        self.radius = radius
         self.num_components = num_components
         self.anchors_span_full_range = anchors_span_full_range
         self.arc_center = arc_center
@@ -277,10 +274,23 @@ class Arc(TipableVMobject):
         self.angle = angle
         self._failed_to_get_center = False
         TipableVMobject.__init__(self, **kwargs)
+        if radius is None:  # apparently None is passed by ArcBetweenPoints
+            radius = 1.0
+        self.radius = radius
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @radius.setter
+    def radius(self, radius):
+        arc_center = self.get_arc_center()
+        curr_radius = np.linalg.norm(self.points[0] - arc_center)
+        self.scale(radius / curr_radius, about_point=arc_center)
+        self._radius = radius
 
     def generate_points(self):
         self.set_pre_positioned_points()
-        self.scale(self.radius, about_point=ORIGIN)
         self.shift(self.arc_center)
 
     def set_pre_positioned_points(self):
