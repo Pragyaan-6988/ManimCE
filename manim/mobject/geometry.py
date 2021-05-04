@@ -60,7 +60,7 @@ __all__ = [
 
 import math
 import warnings
-from typing import Sequence
+from typing import Optional, Sequence
 
 import numpy as np
 
@@ -812,6 +812,14 @@ class Line(TipableVMobject):
             else:
                 return mob.get_boundary_point(direction)
         return np.array(mob_or_point)
+
+    def move_start_to(self, start: Sequence[float], buff: Optional[float] = None):
+        buff = buff if buff is not None else 0
+        return self.shift(start + self.get_unit_vector() * buff - self.get_start())
+
+    def move_end_to(self, end: Sequence[float], buff: Optional[float] = None):
+        buff = buff if buff is not None else 0
+        return self.shift(end - self.get_unit_vector() * buff - self.get_end())
 
     def put_start_and_end_on(self, start: Sequence[float], end: Sequence[float]):
         """Sets starts and end coordinates of a line.
